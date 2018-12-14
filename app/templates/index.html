@@ -1,0 +1,37 @@
+
+{% extends "base.html" %}
+{% block title %} index {% endblock %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block page_content %}
+<div class="page-header">
+        <h1>Hello,
+            {% if current_user.is_authenticated %}
+                {{ current_user.username }}
+            {% else %}
+                Stranger
+            {% endif %}
+        </h1>
+</div>
+<!--写文章的表单-->
+<div>
+    {% if current_user.can(Permission.WRITE_ARTICLES) %}
+        {{ wtf.quick_form(form) }}
+    {% endif %}
+</div>
+{% if current_user.is_authenticated %}
+<!--文章列表-->
+{% include '_posts.html' %}
+<!--分页器-->
+<div class="pagination">
+    {{ macros.pagination_widget(pagination,'.index') }}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %} Flasky - {{ user.username }} {% endblock %}
+{% block page_content %}
+<div class="page-header">
+
+    {% if user == current_user and current_user.is_administrator() != True %}
+    <a href="{{ url_for('.edit_profile') }}" class="btn btn-default">
+        Edit Profile
+    </a>
+    {% endif %}
+    <!--管理员编辑资料按钮-->
+    {% if current_user.is_administrator() %}
+    <a href="{{ url_for('.edit_profile_admin',id = user.id) }}" class="btn btn-danger">
+        Edit Profile [Admin]
+    </a>
+    {% endif %}
+    <h1 class="edit-profile_head">
+        <img src="{{ user.gravatar(size=256) }}" alt="" class="img-rounded edit-headImg">
+        {{ user.username }}
+    </h1>
+    {% if user.name or user.location %}
+    <p>
+        {% if user.name %} {{ user.name }} {% endif %}
+        {% if user.location %}
+            From <a href="http://maps.google.cpm?q= {{ user.location }}">
+            {{ user.location }}
+        </a>
+
+        {% endif %}
+    </p>
+    {% endif %}
+    <!--添加关注相关信息-->
+    <!--关注取关按钮-->
+        {% if not current_user.is_following(user) %}
+        <a href="{{ url_for('.follow',username=user.username) }}" class="btn btn-defaulg"> Follow </a>
+        {% else %}
+        <a href="{{ url_for('.unfollow',username=user.username) }}" class="btn btn-defaulg"> Unfollow </a>
+        {% endif %}
+    <a href="{{ url_for('.followers', username=user.username) }}">Followers: <span class="badge">{{ user.followers.count() - 1}}</span></a>
+    <a href="{{ url_for('.followed_by', username=user.username) }}">Following: <span class="badge">{{ user.followed.count() - 1}}</span></a>
+    {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
+    | <span class="label label-default">Follows you</span>
+    {% endif %}
+
+
+
+
+
+
+
+
+
+    {% if current_user.is_administrator() %}
+    <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+    {% endif %}
+    {% if user.about_me %} <p>{{ user.about_me }}</p> {% endif %}
+    <p>
+        Member since {{ moment(user.member_since).format('L') }}
+        Last seen {{ moment(user.last_seen).fromNow() }}
+    </p>
+    <!--用户发不过的文章列表-->
+    <h3>Post by {{ user.username }} </h3>
+    {% include '_posts.html' %}
+</div>
+{% endblock %}
